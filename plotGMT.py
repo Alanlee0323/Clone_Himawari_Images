@@ -1,4 +1,5 @@
 import numpy as np
+import os 
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
@@ -42,15 +43,22 @@ def plot_map_with_data(data_file_path, extent, locked_longitude, locked_latitude
     ax.plot([extent[0], extent[1]], [locked_latitude, locked_latitude], color='red', linestyle='-', linewidth=2, transform=ccrs.PlateCarree())
 
     # 顯示圖像
-    plt.show()
+    plt.savefig(data_file_path.replace('.txt', '.png'))
 
-# 假設數據文件路徑
-data_file_path = 'Data\Output1\little-endian-201906020850.ext.01.fld.geossgrid05_output.txt'
-# 假設經緯度範圍
-extent = [119, 120, 17, 18]
-# 鎖定的經緯度
-locked_longitude = 119
-locked_latitude = 20
 
-# 呼叫函數來繪製地圖
-plot_map_with_data(data_file_path, extent, locked_longitude, locked_latitude)
+def main():
+    # 假設經緯度範圍
+    extent = [119, 120, 17, 18]
+    # 鎖定的經緯度
+    locked_longitude = 119
+    locked_latitude = 20
+
+    # 呼叫函數來繪製地圖
+    for files in os.listdir('Data\Output1'):
+        if files.endswith('.txt'):
+            full_path = os.path.join('Data\Output1', files)
+            plot_map_with_data(full_path, extent, locked_longitude, locked_latitude)
+
+# 確認這個檔案被執行，而不是被引入
+if __name__ == "__main__":
+    main()
