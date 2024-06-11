@@ -58,10 +58,6 @@ See the bands and sampling gradations from [Himawari satellite](http://quicklook
 These illustrations visually demonstrate how to adjust latitude and longitude indices and the byte conversion process, aiding in your understanding of the script's functionality.
 
 
-## Configuration
-
-The tool can be configured using the `config.py` file. Set your desired latitude and longitude ranges to filter the satellite images you need.
-
 ## Contribution
 
 Feel free to fork this repository, make changes, and submit pull requests. Contributions are always welcome.
