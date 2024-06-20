@@ -6,12 +6,11 @@ This tool integrates the satellite image download method officially provided by 
 
 - Integrates with the Himawari satellite image download service.
 - Allows filtering by specific latitude and longitude coordinates.
-- Downloads Band 03 (0.64 μm) gridded resolution Images 0.005 degree (approx. 500 m)  in batches to manage large data sets efficiently.
+- Downloads Images of Band 03 (0.64 μm) gridded resolution Images 0.005 degree (approx. 500 m)  in batches .
 
 ## Requirements
-
 - Python 3.6
-- ext.01 file (Conversion count value into tbb)  The convert program is available from count2tbb_v101.tgz
+- ext.01 file (Conversion count value into tbb)
 - downloads.txt (The time period you want to download Ex: yyyymmdd(starttime) yyyymmdd(endtime))
 
 ## Installation
@@ -51,7 +50,7 @@ The byte conversion process is integral to the script, particularly in the `read
 Below are two illustrations to help you understand the latitude and longitude adjustments and the byte conversion process:
 
 **Latitude and Longitude Adjustments:**
-![Latitude and Longitude Adjustments](![lat](https://github.com/Alanlee0323/Clone_Hiwamari_Images/assets/95911604/0c469f36-e2c8-4fac-adcf-ee82b0923d4a)
+![lat](https://github.com/Alanlee0323/Clone_Hiwamari_Images/assets/95911604/0c469f36-e2c8-4fac-adcf-ee82b0923d4a)
 
 **Byte Conversion Process:**
 
