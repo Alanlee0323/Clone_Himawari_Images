@@ -11,7 +11,7 @@ This tool integrates the satellite image download method officially provided by 
 ## Requirements
 - Python 3.6
 - ext.01 file (Conversion count value into tbb)
-- downloads.txt (The time period you want to download Ex: yyyymmdd(starttime) yyyymmdd(endtime))
+- downloads.txt (The time period you want to download Ex: yyyymmdd(StartTime) yyyymmdd(EndTime))
 
 ## Installation
 
