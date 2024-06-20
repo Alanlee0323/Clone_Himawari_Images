@@ -1,4 +1,4 @@
-# Internal Wave Detection Tool
+# Hiwamari 8 clone Images Tool
 
 This tool integrates the satellite image download method officially provided by the [Himawari satellite](http://quicklooks.cr.chiba-u.ac.jp/~himawari_movie/rd_gridded.html). It filters the required latitude and longitude, and downloads the images in batches.
 
@@ -6,18 +6,19 @@ This tool integrates the satellite image download method officially provided by 
 
 - Integrates with the Himawari satellite image download service.
 - Allows filtering by specific latitude and longitude coordinates.
-- Downloads images in batches to manage large data sets efficiently.
+- Downloads Images of Band 03 (0.64 μm) gridded resolution Images 0.005 degree (approx. 500 m)  in batches .
 
 ## Requirements
-
 - Python 3.6
+- ext.01 file (Conversion count value into tbb)
+- downloads.txt (The time period you want to download Ex: yyyymmdd(StartTime) yyyymmdd(EndTime))
 
 ## Installation
 
 1. Clone the repository:
     ```
-    git clone https://github.com/Alanlee0323/Internal_wave_detection.git
-    cd Internal_wave_detection
+    git clone https://github.com/Alanlee0323/Clone_Hiwamari_Images.git
+    cd Clone_Hiwamari_Images
     ```
 ## Usage
 
@@ -49,7 +50,7 @@ The byte conversion process is integral to the script, particularly in the `read
 Below are two illustrations to help you understand the latitude and longitude adjustments and the byte conversion process:
 
 **Latitude and Longitude Adjustments:**
-![Latitude and Longitude Adjustments](https://github.com/Alanlee0323/Internal_wave_detection/assets/95911604/66bfdbe6-4510-4347-a936-f3a144c359e4/latitude_longitude_adjustments.png)
+![lat](https://github.com/Alanlee0323/Clone_Hiwamari_Images/assets/95911604/0c469f36-e2c8-4fac-adcf-ee82b0923d4a)
 
 **Byte Conversion Process:**
 
