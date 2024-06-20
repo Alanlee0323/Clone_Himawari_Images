@@ -240,6 +240,5 @@ def main():
 
         process_time_range(start_time_str, end_time_str)
 
-# 確認這個檔案被執行，而不是被引入
 if __name__ == "__main__":
     main()
