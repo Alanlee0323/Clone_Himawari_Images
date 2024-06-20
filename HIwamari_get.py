@@ -4,6 +4,7 @@ import subprocess
 import sys
 from datetime import datetime, timedelta
 import shutil
+import numpy as np
 
 def is_valid_time_format(time_str):
     if len(time_str) != 12:
@@ -33,6 +34,57 @@ def write_to_file(urls, start_time_str, end_time_str):
     with open(file_name, 'w') as file:
         for url in urls:
             file.write(url + '\n')
+
+
+def convert_count_to_tbb(input_filename, convert_table_filename, output_filename):
+    NX = 24000
+    NY = 12000
+    
+    # 分配內存
+    data_all = np.zeros((NY, NX), dtype=np.uint16)
+    dt = np.zeros((NY, NX), dtype=np.float32)
+    tbb = np.zeros(5000, dtype=np.float32)
+    
+    # 讀取數據文件
+    try:
+        with open(input_filename, 'rb') as f:
+            data_all = np.fromfile(f, dtype=np.uint16).reshape((NY*2, NX))
+    except FileNotFoundError:
+        print(f"*** inputfile ({input_filename}) cannot open ***")
+        return
+    
+    # 讀取 TBB 轉換表
+    try:
+        with open(convert_table_filename, 'r') as f:
+            lines = f.readlines()
+            if len(lines) < 5000:
+                print(f"*** convert file ({convert_table_filename}) has fewer than 5000 lines ***")
+                print(f"Only {len(lines)} lines found. Filling the rest with zero.")
+            for i, line in enumerate(lines):
+                values = line.strip().split()
+                if len(values) != 2:
+                    print(f"*** invalid format in convert file ({convert_table_filename}) at line {i+1} ***")
+                    return
+                tmp_cn, tmp_tbb = map(float, values)
+                tbb[int(tmp_cn)] = tmp_tbb
+            # 填充剩餘部分
+            for j in range(len(lines), 5000):
+                tbb[j] = 0.0
+    except FileNotFoundError:
+        print(f"*** convert file ({convert_table_filename}) cannot open ***")
+        return
+    
+    # 轉換 CNT 到 TBB
+    for i in range(NY):
+        for j in range(NX):
+            cn = data_all[i, j]
+            dt[i, j] = tbb[cn]
+    
+    # 輸出數據
+    with open(output_filename, 'wb') as f:
+        dt.tofile(f)
+    
+    print(f"Conversion complete. Output written to {output_filename}")
 
 def process_time_range(start_time_str, end_time_str):
     urls = generate_urls(start_time_str, end_time_str)
@@ -80,24 +132,27 @@ def process_time_range(start_time_str, end_time_str):
     except OSError as e:
         print(f"錯誤: 嘗試刪除檔案時發生錯誤，錯誤訊息 {e.strerror}")
 
+
     '''tbb Transform'''
     try:
-        shutil.copy(r"ext.01", ".")
-        shutil.copy(r"c2t05.x", ".")
-        print("tbb 轉換所需文件已複製完成。")
-    except IOError as e:
-        print(f"錯誤: 複製 tbb 轉換文件時發生錯誤，錯誤訊息 {e.strerror}")
+        little_endian_files = [f for f in os.listdir(directory_name) if f.startswith("little-endian")]
+        for little_endian_file in little_endian_files:
+            input_file_path = os.path.join(directory_name, little_endian_file)
+            output_filename = os.path.join(directory_name, "tbb" + little_endian_file)
+            convert_count_to_tbb(input_file_path, r'ext.01', output_filename)
+            print(f"'{little_endian_file}' 轉換為小端格式完成，輸出檔案為 '{output_filename}'。")
+    except OSError as e:
+        print(f"錯誤: 嘗試 tbb Transform 時發生錯誤，錯誤訊息 {e.strerror}")
+    try:
+        for little_endian_file in little_endian_files:
+            if not little_endian_file.startswith("tbb"):
+                file_to_delete = os.path.join(directory_name, little_endian_file)
+                os.remove(file_to_delete)
+                print(f"已刪除檔案 '{file_to_delete}'。")
+        print("非 'tbb' 檔案刪除完成。")
+    except OSError as e:
+        print(f"錯誤: 嘗試刪除檔案時發生錯誤，錯誤訊息 {e.strerror}")
 
-    # 進行 TBB 轉換
-    for geoss_file in geoss_files:
-        try:
-            input_file = os.path.join(directory_name, geoss_file)
-            subprocess.run(["./c2t05.x", input_file, "ext.01"], check=True)
-            print(f"'{geoss_file}' 轉換為 TBB 格式完成。")
-        except subprocess.CalledProcessError as e:
-            print(f"錯誤: 執行 '{geoss_file}' 的 TBB 轉換時發生錯誤，錯誤代碼 {e.returncode}")
-        except Exception as e:
-            print(f"錯誤: 處理 '{geoss_file}' 時發生未知錯誤，錯誤訊息: {e}")
 
     '''只擷取我需要的經緯度'''
     def process_data(folder_path, start_row, end_row, start_column, end_column, output_folder):
@@ -144,14 +199,14 @@ def process_time_range(start_time_str, end_time_str):
             print(f"處理數據時出錯: {e}")
 
         try:
-            little_endian_files = [f for f in os.listdir(directory_name) if f.startswith('little-endian')]
-            for geoss_file in little_endian_files:
-                if not geoss_file.endswith(".txt"):
-                    file_to_delete = os.path.join(little_endian_files, geoss_file)
+            tbb_files = [f for f in os.listdir(directory_name) if f.startswith('tbb')]
+            for tbb_file in tbb_files:
+                if not tbb_file.endswith(".txt"):
+                    file_to_delete = os.path.join(directory_name, tbb_file)
                     os.remove(file_to_delete)
                     print(f"已刪除檔案 '{file_to_delete}'。")
         except OSError as e:
-            print(f"錯誤: 嘗試刪除檔案時發生錯誤，錯誤訊息 {e.strerror}")
+            print(f"錯誤: 嘗試刪除tbb_file時發生錯誤，錯誤訊息 {e.strerror}")
 
     folder_path = directory_name
     output_folder = directory_name
@@ -165,7 +220,7 @@ def process_time_range(start_time_str, end_time_str):
 '''主運作邏輯'''
 def main():
     # 從用戶那裡讀取包含多個時間區間的文本檔案
-    time_ranges_file = r"Download_time_1.txt"  # 這裡放你的時間區間文件
+    time_ranges_file = r"Download_time_1_6.txt"
     
     try:
         with open(time_ranges_file, 'r') as file:
@@ -176,8 +231,8 @@ def main():
 
     for line in time_ranges:
         start_time_str, end_time_str = line.strip().split()
-        start_time_str += "0000"
-        end_time_str += "0000"
+        start_time_str += "0850"
+        end_time_str += "0900"
         
         if not is_valid_time_format(start_time_str) or not is_valid_time_format(end_time_str):
             print(f"時間格式錯誤，請確保格式為 YYYYMMDDHHMM。({line.strip()})")
