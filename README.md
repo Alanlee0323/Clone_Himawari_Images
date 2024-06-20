@@ -1,4 +1,4 @@
-# Internal Wave Detection Tool
+# Hiwamari 8 clone Images Tool
 
 This tool integrates the satellite image download method officially provided by the [Himawari satellite](http://quicklooks.cr.chiba-u.ac.jp/~himawari_movie/rd_gridded.html). It filters the required latitude and longitude, and downloads the images in batches.
 
@@ -11,13 +11,14 @@ This tool integrates the satellite image download method officially provided by 
 ## Requirements
 
 - Python 3.6
+- ext.01 file (Conversion count value into tbb)  The convert program is available from count2tbb_v101.tgz
 
 ## Installation
 
 1. Clone the repository:
     ```
     git clone https://github.com/Alanlee0323/Internal_wave_detection.git
-    cd Internal_wave_detection
+    cd Clone_Hiwamari_Images
     ```
 ## Usage
 
